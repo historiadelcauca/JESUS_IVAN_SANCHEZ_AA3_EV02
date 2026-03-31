@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Productos | La Tiendita Martínez</title>
+  <meta name="description" content="Módulo de productos del sistema La Tiendita Martínez">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <!-- ── TOPBAR ── -->
+  <header class="topbar">
+    <div class="topbar__inner">
+      <div class="topbar__marca">
+        <img
+          src="logo-tiendiita.png"
+          alt="Logo La Tiendita Martínez"
+          class="topbar__logo"
+        >
+        <div class="topbar__texto">
+          <span class="topbar__nombre">La Tiendita Martínez</span>
+          <span class="topbar__subtitulo">Sistema de Gestión</span>
+        </div>
+      </div>
+      <div class="topbar__info">
+        <a href="index.html" class="btn btn--volver">
+          ← Volver al panel
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <!-- ── CONTENIDO ── -->
+  <main class="page page--clientes">
+    <section class="card card--clientes">
+
+      <header class="card__header">
+        <div class="brand-line"></div>
+        <img
+          src="logo-tiendiita.png"
+          alt="Logo de La Tiendita Martínez"
+          class="card__logo"
+        >
+        <h1 class="card__title">Módulo de Productos</h1>
+        <p class="card__subtitle">
+          Aquí puedes registrar, consultar y gestionar los productos de La Tiendita Martínez.
+        </p>
+      </header>
+
+      <!-- ── PANEL: REGISTRAR / EDITAR PRODUCTO ── -->
+      <section class="clientes-panel">
+        <h2 class="section-title" id="tituloFormulario">
+          <span class="section-title__icon">📦</span>
+          Registrar producto
+        </h2>
+
+        <input type="hidden" id="idProductoEditar" value="">
+
+        <div class="form-grid form-grid--productos">
+
+          <div class="form-group">
+            <label for="nombre">Nombre</label>
+            <input
+              type="text"
+              id="nombre"
+              placeholder="Ej: Gaseosa 1.5L"
+              autocomplete="off"
+            >
+          </div>
+
+          <div class="form-group">
+            <label for="codigoBarra">Código de barra</label>
+            <input
+              type="text"
+              id="codigoBarra"
+              placeholder="Ej: BEB001"
+              autocomplete="off"
+            >
+          </div>
+
+          <div class="form-group">
+            <label for="categoria">Categoría</label>
+            <input
+              type="text"
+              id="categoria"
+              placeholder="Ej: Bebidas"
+              autocomplete="off"
+            >
+          </div>
+
+          <div class="form-group">
+            <label for="categoria_id">ID Categoría</label>
+            <input
+              type="number"
+              id="categoria_id"
+              placeholder="Ej: 1"
+              min="1"
+            >
+          </div>
+
+          <div class="form-group">
+            <label for="precioVenta">Precio de venta</label>
+            <input
+              type="number"
+              id="precioVenta"
+              placeholder="Ej: 4500"
+              min="0"
+            >
+          </div>
+
+          <div class="form-group">
+            <label for="precioCompra">Precio de compra</label>
+            <input
+              type="number"
+              id="precioCompra"
+              placeholder="Ej: 3500"
+              min="0"
+            >
+          </div>
+
+          <div class="form-group">
+            <label for="unidadMedida">Unidad de medida</label>
+            <input
+              type="text"
+              id="unidadMedida"
+              placeholder="Ej: Unidad"
+              autocomplete="off"
+            >
+          </div>
+
+          <div class="form-group">
+            <label for="fechaVencimiento">Fecha de vencimiento</label>
+            <input
+              type="date"
+              id="fechaVencimiento"
+            >
+          </div>
+
+          <div class="form-actions">
+            <button type="button" id="btnGuardar" class="btn btn--primary">
+              💾 Guardar producto
+            </button>
+            <button type="button" id="btnLimpiar" class="btn btn--secondary">
+              🧹 Limpiar formulario
+            </button>
+          </div>
+
+        </div>
+
+        <div id="mensajeRespuesta" class="mensaje" style="display:none;"></div>
+      </section>
+
+      <!-- ── PANEL: LISTADO DE PRODUCTOS ── -->
+      <section class="clientes-panel">
+        <div class="panel-header">
+          <h2 class="section-title">
+            <span class="section-title__icon">📋</span>
+            Listado de productos
+          </h2>
+          <button type="button" id="btnActualizarLista" class="btn btn--outline">
+            🔄 Actualizar lista
+          </button>
+        </div>
+
+        <div class="table-responsive">
+          <table class="tabla-clientes">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Nombre</th>
+                <th>Código</th>
+                <th>Categoría</th>
+                <th>P. Venta</th>
+                <th>P. Compra</th>
+                <th>Unidad</th>
+                <th>Vencimiento</th>
+                <th>Acciones</th>
+              </tr>
+            </thead>
+            <tbody id="tablaProductosBody">
+              <tr>
+                <td colspan="9" class="table-message">
+                  Haz clic en "Actualizar lista" para cargar los productos.
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <footer class="card__footer">
+        <p class="footer__text">© 2026 Sistema Minimarket · La Tiendita Martínez</p>
+      </footer>
+
+    </section>
+  </main>
+
+  <script>
+    const API_PRODUCTOS = "http://localhost:3000/app/productos";
+
+    const tablaProductosBody = document.getElementById("tablaProductosBody");
+    const btnActualizarLista = document.getElementById("btnActualizarLista");
+    const btnGuardar         = document.getElementById("btnGuardar");
+    const btnLimpiar         = document.getElementById("btnLimpiar");
+    const mensajeRespuesta   = document.getElementById("mensajeRespuesta");
+    const tituloFormulario   = document.getElementById("tituloFormulario");
+    const idProductoEditar   = document.getElementById("idProductoEditar");
+
+    // ── Mostrar mensaje ──
+    function mostrarMensaje(texto, tipo) {
+      mensajeRespuesta.textContent = texto;
+      mensajeRespuesta.className = "mensaje " + (tipo === "ok" ? "mensaje--ok" : "mensaje--error");
+      mensajeRespuesta.style.display = "block";
+      setTimeout(() => {
+        mensajeRespuesta.style.display = "none";
+      }, 4000);
+    }
+
+    // ── Limpiar formulario ──
+    function limpiarFormulario() {
+      document.getElementById("nombre").value = "";
+      document.getElementById("codigoBarra").value = "";
+      document.getElementById("categoria").value = "";
+      document.getElementById("categoria_id").value = "";
+      document.getElementById("precioVenta").value = "";
+      document.getElementById("precioCompra").value = "";
+      document.getElementById("unidadMedida").value = "";
+      document.getElementById("fechaVencimiento").value = "";
+      idProductoEditar.value = "";
+      tituloFormulario.innerHTML = `<span class="section-title__icon">📦</span> Registrar producto`;
+      btnGuardar.textContent = "💾 Guardar producto";
+    }
+
+    // ── Cargar producto en formulario para editar ──
+    function cargarProductoEnFormulario(producto) {
+      document.getElementById("nombre").value = producto.nombre;
+      document.getElementById("codigoBarra").value = producto.codigoBarra;
+      document.getElementById("categoria").value = producto.categoria;
+      document.getElementById("categoria_id").value = producto.categoria_id;
+      document.getElementById("precioVenta").value = producto.precioVenta;
+      document.getElementById("precioCompra").value = producto.precioCompra;
+      document.getElementById("unidadMedida").value = producto.unidadMedida;
+      document.getElementById("fechaVencimiento").value = producto.fechaVencimiento
+        ? producto.fechaVencimiento.substring(0, 10)
+        : "";
+      idProductoEditar.value = producto.idProducto;
+      tituloFormulario.innerHTML = `<span class="section-title__icon">✏️</span> Editando producto #${producto.idProducto}`;
+      btnGuardar.textContent = "✏️ Actualizar producto";
+      tituloFormulario.scrollIntoView({ behavior: "smooth" });
+    }
+
+    // ── Formatear fecha ──
+    function formatearFecha(fecha) {
+      if (!fecha) return "Sin vencimiento";
+      return fecha.substring(0, 10);
+    }
+
+    // ── GET: Cargar productos en la tabla ──
+    async function cargarProductos() {
+      try {
+        tablaProductosBody.innerHTML = `
+          <tr><td colspan="9" class="table-message">Cargando productos...</td></tr>
+        `;
+
+        const respuesta = await fetch(API_PRODUCTOS);
+        const resultado = await respuesta.json();
+
+        if (!respuesta.ok || !resultado.ok) {
+          throw new Error(resultado.mensaje || "No se pudo obtener la lista de productos");
+        }
+
+        const productos = resultado.productos;
+
+        if (!productos || productos.length === 0) {
+          tablaProductosBody.innerHTML = `
+            <tr><td colspan="9" class="table-message">No hay productos registrados.</td></tr>
+          `;
+          return;
+        }
+
+        tablaProductosBody.innerHTML = productos.map((producto) => `
+          <tr>
+            <td>${producto.idProducto}</td>
+            <td>${producto.nombre}</td>
+            <td>${producto.codigoBarra}</td>
+            <td>${producto.categoria}</td>
+            <td>$${Number(producto.precioVenta).toLocaleString("es-CO")}</td>
+            <td>$${Number(producto.precioCompra).toLocaleString("es-CO")}</td>
+            <td>${producto.unidadMedida}</td>
+            <td>${formatearFecha(producto.fechaVencimiento)}</td>
+            <td class="acciones-celda">
+              <button
+                type="button"
+                class="btn btn--secondary"
+                onclick="cargarProductoEnFormulario(${JSON.stringify(producto).replace(/"/g, '&quot;')})"
+              >✏️ Editar</button>
+              <button
+                type="button"
+                class="btn btn--danger"
+                onclick="eliminarProducto(${producto.idProducto}, '${producto.nombre.replace(/'/g, "\\'")}')"
+              >🗑️ Eliminar</button>
+            </td>
+          </tr>
+        `).join("");
+
+      } catch (error) {
+        console.error("Error cargando productos:", error);
+        tablaProductosBody.innerHTML = `
+          <tr><td colspan="9" class="table-message">Error al cargar los productos. Revisa el servidor.</td></tr>
+        `;
+      }
+    }
+
+    // ── Leer campos del formulario ──
+    function leerFormulario() {
+      return {
+        nombre:           document.getElementById("nombre").value.trim(),
+        codigoBarra:      document.getElementById("codigoBarra").value.trim(),
+        categoria:        document.getElementById("categoria").value.trim(),
+        categoria_id:     document.getElementById("categoria_id").value,
+        precioVenta:      document.getElementById("precioVenta").value,
+        precioCompra:     document.getElementById("precioCompra").value,
+        unidadMedida:     document.getElementById("unidadMedida").value.trim(),
+        fechaVencimiento: document.getElementById("fechaVencimiento").value || null
+      };
+    }
+
+    // ── Validar campos ── ← CORRECCIÓN AQUÍ
+    function validarFormulario(datos) {
+      if (
+        !datos.nombre       ||
+        !datos.codigoBarra  ||
+        !datos.categoria    ||
+        !datos.categoria_id ||
+        datos.precioVenta  === "" ||
+        datos.precioCompra === "" ||
+        !datos.unidadMedida
+      ) {
+        mostrarMensaje("Por favor completa todos los campos obligatorios.", "error");
+        return false;
+      }
+      return true;
+    }
+
+    // ── POST: Crear producto ──
+    async function crearProducto(datos) {
+      const respuesta = await fetch(API_PRODUCTOS, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(datos)
+      });
+      const resultado = await respuesta.json();
+      if (!respuesta.ok || !resultado.ok) {
+        throw new Error(resultado.mensaje || "No se pudo crear el producto");
+      }
+      return resultado;
+    }
+
+    // ── PUT: Actualizar producto ──
+    async function actualizarProducto(id, datos) {
+      const respuesta = await fetch(`${API_PRODUCTOS}/${id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(datos)
+      });
+      const resultado = await respuesta.json();
+      if (!respuesta.ok || !resultado.ok) {
+        throw new Error(resultado.mensaje || "No se pudo actualizar el producto");
+      }
+      return resultado;
+    }
+
+    // ── DELETE: Eliminar producto ──
+    async function eliminarProducto(id, nombreProducto) {
+      const confirmar = confirm(`¿Estás seguro de que deseas eliminar "${nombreProducto}"?\nEsta acción no se puede deshacer.`);
+      if (!confirmar) return;
+
+      try {
+        const respuesta = await fetch(`${API_PRODUCTOS}/${id}`, {
+          method: "DELETE"
+        });
+        const resultado = await respuesta.json();
+        if (!respuesta.ok || !resultado.ok) {
+          throw new Error(resultado.mensaje || "No se pudo eliminar el producto");
+        }
+        mostrarMensaje(`✅ Producto "${nombreProducto}" eliminado correctamente.`, "ok");
+        await cargarProductos();
+      } catch (error) {
+        console.error("Error eliminando producto:", error);
+        mostrarMensaje("❌ " + error.message, "error");
+      }
+    }
+
+    // ── Botón Guardar: decide si crea o actualiza ──
+    async function guardarOActualizar() {
+      const datos    = leerFormulario();
+      const idEditar = idProductoEditar.value;
+
+      if (!validarFormulario(datos)) return;
+
+      try {
+        if (idEditar) {
+          await actualizarProducto(idEditar, datos);
+          mostrarMensaje("✅ Producto actualizado correctamente.", "ok");
+        } else {
+          await crearProducto(datos);
+          mostrarMensaje("✅ Producto creado correctamente.", "ok");
+        }
+        limpiarFormulario();
+        await cargarProductos();
+      } catch (error) {
+        console.error("Error:", error);
+        mostrarMensaje("❌ " + error.message, "error");
+      }
+    }
+
+    // ── Eventos ──
+    btnActualizarLista.addEventListener("click", cargarProductos);
+    btnGuardar.addEventListener("click", guardarOActualizar);
+    btnLimpiar.addEventListener("click", limpiarFormulario);
+
+  </script>
+
+</body>
+</html>

@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Clientes | La Tiendita Martínez</title>
+  <meta name="description" content="Módulo de clientes del sistema La Tiendita Martínez">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <!-- ── TOPBAR ── -->
+  <header class="topbar">
+    <div class="topbar__inner">
+      <div class="topbar__marca">
+        <img
+          src="logo-tiendiita.png"
+          alt="Logo La Tiendita Martínez"
+          class="topbar__logo"
+        >
+        <div class="topbar__texto">
+          <span class="topbar__nombre">La Tiendita Martínez</span>
+          <span class="topbar__subtitulo">Sistema de Gestión</span>
+        </div>
+      </div>
+      <div class="topbar__info">
+        <a href="index.html" class="btn btn--volver">
+          ← Volver al panel
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <!-- ── CONTENIDO ── -->
+  <main class="page page--clientes">
+    <section class="card card--clientes">
+
+      <header class="card__header">
+        <div class="brand-line"></div>
+
+        <img
+          src="logo-tiendiita.png"
+          alt="Logo de La Tiendita Martínez"
+          class="card__logo"
+        >
+
+        <h1 class="card__title">Módulo de Clientes</h1>
+        <p class="card__subtitle">
+          Aquí puedes registrar, consultar y gestionar los clientes de La Tiendita Martínez.
+        </p>
+      </header>
+
+      <!-- ── PANEL: REGISTRAR / EDITAR CLIENTE ── -->
+      <section class="clientes-panel">
+        <h2 class="section-title" id="tituloFormulario">
+          <span class="section-title__icon">👤</span>
+          Registrar cliente
+        </h2>
+
+        <input type="hidden" id="idClienteEditar" value="">
+
+        <div class="form-grid">
+          <div class="form-group">
+            <label for="nombre">Nombre completo</label>
+            <input
+              type="text"
+              id="nombre"
+              name="nombre"
+              placeholder="Ej: María Fernanda López"
+              autocomplete="off"
+            >
+          </div>
+
+          <div class="form-group">
+            <label for="telefono">Teléfono</label>
+            <input
+              type="text"
+              id="telefono"
+              name="telefono"
+              placeholder="Ej: 3001234567"
+              autocomplete="off"
+            >
+          </div>
+
+          <div class="form-group">
+            <label for="puntosAcumulados">Puntos acumulados</label>
+            <input
+              type="number"
+              id="puntosAcumulados"
+              name="puntosAcumulados"
+              min="0"
+              value="0"
+            >
+          </div>
+
+          <div class="form-actions">
+            <button type="button" id="btnGuardar" class="btn btn--primary">
+              💾 Guardar cliente
+            </button>
+            <button type="button" id="btnLimpiar" class="btn btn--secondary">
+              🧹 Limpiar formulario
+            </button>
+          </div>
+        </div>
+
+        <div id="mensajeRespuesta" class="mensaje" style="display:none;"></div>
+      </section>
+
+      <!-- ── PANEL: LISTADO DE CLIENTES ── -->
+      <section class="clientes-panel">
+        <div class="panel-header">
+          <h2 class="section-title">
+            <span class="section-title__icon">📋</span>
+            Listado de clientes
+          </h2>
+          <button type="button" id="btnActualizarLista" class="btn btn--outline">
+            🔄 Actualizar lista
+          </button>
+        </div>
+
+        <div class="table-responsive">
+          <table class="tabla-clientes">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Nombre</th>
+                <th>Teléfono</th>
+                <th>Puntos</th>
+                <th>Acciones</th>
+              </tr>
+            </thead>
+            <tbody id="tablaClientesBody">
+              <tr>
+                <td colspan="5" class="table-message">
+                  Haz clic en "Actualizar lista" para cargar los clientes.
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <footer class="card__footer">
+        <p class="footer__text">© 2026 Sistema Minimarket · La Tiendita Martínez</p>
+      </footer>
+
+    </section>
+  </main>
+
+  <script>
+    const API_CLIENTES = "http://localhost:3000/app/clientes";
+
+    const tablaClientesBody  = document.getElementById("tablaClientesBody");
+    const btnActualizarLista = document.getElementById("btnActualizarLista");
+    const btnGuardar         = document.getElementById("btnGuardar");
+    const btnLimpiar         = document.getElementById("btnLimpiar");
+    const mensajeRespuesta   = document.getElementById("mensajeRespuesta");
+    const tituloFormulario   = document.getElementById("tituloFormulario");
+    const idClienteEditar    = document.getElementById("idClienteEditar");
+
+    // ── Mostrar mensaje de éxito o error ──
+    function mostrarMensaje(texto, tipo) {
+      mensajeRespuesta.textContent = texto;
+      mensajeRespuesta.className = "mensaje " + (tipo === "ok" ? "mensaje--ok" : "mensaje--error");
+      mensajeRespuesta.style.display = "block";
+      setTimeout(() => {
+        mensajeRespuesta.style.display = "none";
+      }, 4000);
+    }
+
+    // ── Limpiar formulario y volver al modo CREAR ──
+    function limpiarFormulario() {
+      document.getElementById("nombre").value = "";
+      document.getElementById("telefono").value = "";
+      document.getElementById("puntosAcumulados").value = 0;
+      idClienteEditar.value = "";
+      tituloFormulario.innerHTML = `<span class="section-title__icon">👤</span> Registrar cliente`;
+      btnGuardar.textContent = "💾 Guardar cliente";
+    }
+
+    // ── Cargar datos de un cliente en el formulario para editar ──
+    function cargarClienteEnFormulario(cliente) {
+      document.getElementById("nombre").value = cliente.nombre;
+      document.getElementById("telefono").value = cliente.telefono;
+      document.getElementById("puntosAcumulados").value = cliente.puntosAcumulados;
+      idClienteEditar.value = cliente.idCliente;
+      tituloFormulario.innerHTML = `<span class="section-title__icon">✏️</span> Editando cliente #${cliente.idCliente}`;
+      btnGuardar.textContent = "✏️ Actualizar cliente";
+      tituloFormulario.scrollIntoView({ behavior: "smooth" });
+    }
+
+    // ── GET: Cargar clientes en la tabla ──
+    async function cargarClientes() {
+      try {
+        tablaClientesBody.innerHTML = `
+          <tr>
+            <td colspan="5" class="table-message">Cargando clientes...</td>
+          </tr>
+        `;
+
+        const respuesta = await fetch(API_CLIENTES);
+        const resultado = await respuesta.json();
+
+        if (!respuesta.ok || !resultado.ok) {
+          throw new Error("No se pudo obtener la lista de clientes");
+        }
+
+        const clientes = resultado.data;
+
+        if (!clientes || clientes.length === 0) {
+          tablaClientesBody.innerHTML = `
+            <tr>
+              <td colspan="5" class="table-message">No hay clientes registrados.</td>
+            </tr>
+          `;
+          return;
+        }
+
+        tablaClientesBody.innerHTML = clientes.map((cliente) => `
+          <tr>
+            <td>${cliente.idCliente}</td>
+            <td>${cliente.nombre}</td>
+            <td>${cliente.telefono}</td>
+            <td>${cliente.puntosAcumulados}</td>
+            <td class="acciones-celda">
+              <button
+                type="button"
+                class="btn btn--secondary"
+                onclick="cargarClienteEnFormulario(${JSON.stringify(cliente).replace(/"/g, '&quot;')})"
+              >✏️ Editar</button>
+              <button
+                type="button"
+                class="btn btn--danger"
+                onclick="eliminarCliente(${cliente.idCliente}, '${cliente.nombre.replace(/'/g, "\\'")}')"
+              >🗑️ Eliminar</button>
+            </td>
+          </tr>
+        `).join("");
+
+      } catch (error) {
+        console.error("Error cargando clientes:", error);
+        tablaClientesBody.innerHTML = `
+          <tr>
+            <td colspan="5" class="table-message">
+              Error al cargar los clientes. Revisa el servidor o la conexión.
+            </td>
+          </tr>
+        `;
+      }
+    }
+
+    // ── POST: Crear nuevo cliente ──
+    async function crearCliente(nombre, telefono, puntosAcumulados) {
+      const respuesta = await fetch(API_CLIENTES, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ nombre, telefono, puntosAcumulados })
+      });
+      const resultado = await respuesta.json();
+      if (!respuesta.ok || !resultado.ok) {
+        throw new Error(resultado.mensaje || "No se pudo crear el cliente");
+      }
+      return resultado;
+    }
+
+    // ── PUT: Actualizar cliente existente ──
+    async function actualizarCliente(idCliente, nombre, telefono, puntosAcumulados) {
+      const respuesta = await fetch(`${API_CLIENTES}/${idCliente}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ nombre, telefono, puntosAcumulados })
+      });
+      const resultado = await respuesta.json();
+      if (!respuesta.ok || !resultado.ok) {
+        throw new Error(resultado.mensaje || "No se pudo actualizar el cliente");
+      }
+      return resultado;
+    }
+
+    // ── DELETE: Eliminar cliente ──
+    async function eliminarCliente(idCliente, nombreCliente) {
+      const confirmar = confirm(`¿Estás seguro de que deseas eliminar a "${nombreCliente}"?\nEsta acción no se puede deshacer.`);
+      if (!confirmar) return;
+
+      try {
+        const respuesta = await fetch(`${API_CLIENTES}/${idCliente}`, {
+          method: "DELETE"
+        });
+        const resultado = await respuesta.json();
+        if (!respuesta.ok || !resultado.ok) {
+          throw new Error(resultado.mensaje || "No se pudo eliminar el cliente");
+        }
+        mostrarMensaje(`✅ Cliente "${nombreCliente}" eliminado correctamente.`, "ok");
+        await cargarClientes();
+      } catch (error) {
+        console.error("Error eliminando cliente:", error);
+        mostrarMensaje("❌ " + error.message, "error");
+      }
+    }
+
+    // ── Botón Guardar: decide si crea o actualiza ──
+    async function guardarOActualizar() {
+      const nombre           = document.getElementById("nombre").value.trim();
+      const telefono         = document.getElementById("telefono").value.trim();
+      const puntosAcumulados = parseInt(document.getElementById("puntosAcumulados").value, 10);
+      const idEditar         = idClienteEditar.value;
+
+      if (!nombre || !telefono || isNaN(puntosAcumulados)) {
+        mostrarMensaje("Por favor completa todos los campos correctamente.", "error");
+        return;
+      }
+
+      try {
+        if (idEditar) {
+          await actualizarCliente(idEditar, nombre, telefono, puntosAcumulados);
+          mostrarMensaje("✅ Cliente actualizado correctamente.", "ok");
+        } else {
+          await crearCliente(nombre, telefono, puntosAcumulados);
+          mostrarMensaje("✅ Cliente creado correctamente.", "ok");
+        }
+        limpiarFormulario();
+        await cargarClientes();
+      } catch (error) {
+        console.error("Error:", error);
+        mostrarMensaje("❌ " + error.message, "error");
+      }
+    }
+
+    // ── Eventos ──
+    btnActualizarLista.addEventListener("click", cargarClientes);
+    btnGuardar.addEventListener("click", guardarOActualizar);
+    btnLimpiar.addEventListener("click", limpiarFormulario);
+
+  </script>
+
+</body>
+</html>

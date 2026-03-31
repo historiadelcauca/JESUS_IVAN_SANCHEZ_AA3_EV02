@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Empleados | La Tiendita Martínez</title>
+  <meta name="description" content="Módulo de empleados del sistema La Tiendita Martínez">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <!-- ── TOPBAR ── -->
+  <header class="topbar">
+    <div class="topbar__inner">
+      <div class="topbar__marca">
+        <img
+          src="logo-tiendiita.png"
+          alt="Logo La Tiendita Martínez"
+          class="topbar__logo"
+        >
+        <div class="topbar__texto">
+          <span class="topbar__nombre">La Tiendita Martínez</span>
+          <span class="topbar__subtitulo">Sistema de Gestión</span>
+        </div>
+      </div>
+      <div class="topbar__info">
+        <a href="index.html" class="btn btn--volver">
+          ← Volver al panel
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <!-- ── CONTENIDO ── -->
+  <main class="page page--clientes">
+    <section class="card card--clientes">
+
+      <header class="card__header">
+        <div class="brand-line"></div>
+
+        <img
+          src="logo-tiendiita.png"
+          alt="Logo de La Tiendita Martínez"
+          class="card__logo"
+        >
+
+        <h1 class="card__title">Módulo de Empleados</h1>
+        <p class="card__subtitle">
+          Aquí puedes registrar, consultar y gestionar los empleados de La Tiendita Martínez.
+        </p>
+      </header>
+
+      <!-- ── PANEL: REGISTRAR / EDITAR EMPLEADO ── -->
+      <section class="clientes-panel">
+        <h2 class="section-title" id="tituloFormulario">
+          <span class="section-title__icon">🧑‍💼</span>
+          Registrar empleado
+        </h2>
+
+        <input type="hidden" id="idEmpleadoEditar" value="">
+
+        <div class="form-grid">
+          <div class="form-group">
+            <label for="nombre">Nombre completo</label>
+            <input
+              type="text"
+              id="nombre"
+              name="nombre"
+              placeholder="Ej: Carlos Andrés Pérez"
+              autocomplete="off"
+            >
+          </div>
+
+          <div class="form-group">
+            <label for="rol">Rol</label>
+            <input
+              type="text"
+              id="rol"
+              name="rol"
+              placeholder="Ej: Cajero"
+              autocomplete="off"
+            >
+          </div>
+
+          <div class="form-group">
+            <label for="usuario">Usuario</label>
+            <input
+              type="text"
+              id="usuario"
+              name="usuario"
+              placeholder="Ej: caperez"
+              autocomplete="off"
+            >
+          </div>
+
+          <div class="form-group">
+            <label for="password">Contraseña</label>
+            <input
+              type="password"
+              id="password"
+              name="password"
+              placeholder="Contraseña del empleado"
+              autocomplete="new-password"
+            >
+          </div>
+
+          <div class="form-actions">
+            <button type="button" id="btnGuardar" class="btn btn--primary">
+              💾 Guardar empleado
+            </button>
+            <button type="button" id="btnLimpiar" class="btn btn--secondary">
+              🧹 Limpiar formulario
+            </button>
+          </div>
+        </div>
+
+        <div id="mensajeRespuesta" class="mensaje" style="display:none;"></div>
+      </section>
+
+      <!-- ── PANEL: LISTADO DE EMPLEADOS ── -->
+      <section class="clientes-panel">
+        <div class="panel-header">
+          <h2 class="section-title">
+            <span class="section-title__icon">📋</span>
+            Listado de empleados
+          </h2>
+          <button type="button" id="btnActualizarLista" class="btn btn--outline">
+            🔄 Actualizar lista
+          </button>
+        </div>
+
+        <div class="table-responsive">
+          <table class="tabla-clientes">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Nombre</th>
+                <th>Rol</th>
+                <th>Usuario</th>
+                <th>Acciones</th>
+              </tr>
+            </thead>
+            <tbody id="tablaEmpleadosBody">
+              <tr>
+                <td colspan="5" class="table-message">
+                  Cargando empleados...
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <footer class="card__footer">
+        <p class="footer__text">© 2026 Sistema Minimarket · La Tiendita Martínez</p>
+      </footer>
+
+    </section>
+  </main>
+
+  <script>
+    const API_EMPLEADOS = "http://localhost:3000/app/empleados";
+
+    const tablaEmpleadosBody = document.getElementById("tablaEmpleadosBody");
+    const btnActualizarLista = document.getElementById("btnActualizarLista");
+    const btnGuardar         = document.getElementById("btnGuardar");
+    const btnLimpiar         = document.getElementById("btnLimpiar");
+    const mensajeRespuesta   = document.getElementById("mensajeRespuesta");
+    const tituloFormulario   = document.getElementById("tituloFormulario");
+    const idEmpleadoEditar   = document.getElementById("idEmpleadoEditar");
+
+    // ── Al cargar la página ──
+    document.addEventListener("DOMContentLoaded", () => {
+      cargarEmpleados();
+    });
+
+    // ── Mostrar mensaje de éxito o error ──
+    function mostrarMensaje(texto, tipo) {
+      mensajeRespuesta.textContent = texto;
+      mensajeRespuesta.className   = "mensaje " + (tipo === "ok" ? "mensaje--ok" : "mensaje--error");
+      mensajeRespuesta.style.display = "block";
+      setTimeout(() => {
+        mensajeRespuesta.style.display = "none";
+      }, 4000);
+    }
+
+    // ── Limpiar formulario y volver al modo CREAR ──
+    function limpiarFormulario() {
+      document.getElementById("nombre").value   = "";
+      document.getElementById("rol").value      = "";
+      document.getElementById("usuario").value  = "";
+      document.getElementById("password").value = "";
+      idEmpleadoEditar.value = "";
+      tituloFormulario.innerHTML = `<span class="section-title__icon">🧑‍💼</span> Registrar empleado`;
+      btnGuardar.textContent = "💾 Guardar empleado";
+    }
+
+    // ── Cargar datos de un empleado en el formulario para editar ──
+    function cargarEmpleadoEnFormulario(empleado) {
+      document.getElementById("nombre").value   = empleado.nombre;
+      document.getElementById("rol").value      = empleado.rol;
+      document.getElementById("usuario").value  = empleado.usuario;
+      document.getElementById("password").value = "";  // vacío por seguridad
+      idEmpleadoEditar.value = empleado.idEmpleado;
+      tituloFormulario.innerHTML = `<span class="section-title__icon">✏️</span> Editando empleado #${empleado.idEmpleado}`;
+      btnGuardar.textContent = "✏️ Actualizar empleado";
+      tituloFormulario.scrollIntoView({ behavior: "smooth" });
+      mostrarMensaje(`📝 Editando a "${empleado.nombre}". Escribe la contraseña para guardar.`, "ok");
+    }
+
+    // ── GET: Cargar empleados en la tabla ──
+    async function cargarEmpleados() {
+      try {
+        tablaEmpleadosBody.innerHTML = `
+          <tr>
+            <td colspan="5" class="table-message">Cargando empleados...</td>
+          </tr>
+        `;
+
+        const respuesta  = await fetch(API_EMPLEADOS);
+        const resultado  = await respuesta.json();
+
+        if (!respuesta.ok || !resultado.ok) {
+          throw new Error("No se pudo obtener la lista de empleados");
+        }
+
+        const empleados = resultado.data;
+
+        if (!empleados || empleados.length === 0) {
+          tablaEmpleadosBody.innerHTML = `
+            <tr>
+              <td colspan="5" class="table-message">No hay empleados registrados.</td>
+            </tr>
+          `;
+          return;
+        }
+
+        tablaEmpleadosBody.innerHTML = empleados.map((emp) => `
+          <tr>
+            <td>${emp.idEmpleado}</td>
+            <td>${emp.nombre}</td>
+            <td>${emp.rol}</td>
+            <td>${emp.usuario}</td>
+            <td class="acciones-celda">
+              <button
+                type="button"
+                class="btn btn--secondary"
+                onclick="cargarEmpleadoEnFormulario(${JSON.stringify(emp).replace(/"/g, '&quot;')})"
+              >✏️ Editar</button>
+              <button
+                type="button"
+                class="btn btn--danger"
+                onclick="eliminarEmpleado(${emp.idEmpleado}, '${emp.nombre.replace(/'/g, "\\'")}')"
+              >🗑️ Eliminar</button>
+            </td>
+          </tr>
+        `).join("");
+
+      } catch (error) {
+        console.error("Error cargando empleados:", error);
+        tablaEmpleadosBody.innerHTML = `
+          <tr>
+            <td colspan="5" class="table-message">
+              Error al cargar los empleados. Revisa el servidor o la conexión.
+            </td>
+          </tr>
+        `;
+      }
+    }
+
+    // ── POST: Crear nuevo empleado ──
+    async function crearEmpleado(nombre, rol, usuario, password) {
+      const respuesta = await fetch(API_EMPLEADOS, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ nombre, rol, usuario, password })
+      });
+      const resultado = await respuesta.json();
+      if (!respuesta.ok || !resultado.ok) {
+        throw new Error(resultado.mensaje || "No se pudo crear el empleado");
+      }
+      return resultado;
+    }
+
+    // ── PUT: Actualizar empleado existente ──
+    async function actualizarEmpleado(idEmpleado, nombre, rol, usuario, password) {
+      const respuesta = await fetch(`${API_EMPLEADOS}/${idEmpleado}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ nombre, rol, usuario, password })
+      });
+      const resultado = await respuesta.json();
+      if (!respuesta.ok || !resultado.ok) {
+        throw new Error(resultado.mensaje || "No se pudo actualizar el empleado");
+      }
+      return resultado;
+    }
+
+    // ── DELETE: Eliminar empleado ──
+    async function eliminarEmpleado(idEmpleado, nombreEmpleado) {
+      const confirmar = confirm(
+        `¿Estás seguro de que deseas eliminar a "${nombreEmpleado}"?\nEsta acción no se puede deshacer.`
+      );
+      if (!confirmar) return;
+
+      try {
+        const respuesta = await fetch(`${API_EMPLEADOS}/${idEmpleado}`, {
+          method: "DELETE"
+        });
+        const resultado = await respuesta.json();
+        if (!respuesta.ok || !resultado.ok) {
+          throw new Error(resultado.mensaje || "No se pudo eliminar el empleado");
+        }
+        mostrarMensaje(`✅ Empleado "${nombreEmpleado}" eliminado correctamente.`, "ok");
+        await cargarEmpleados();
+      } catch (error) {
+        console.error("Error eliminando empleado:", error);
+        mostrarMensaje("❌ " + error.message, "error");
+      }
+    }
+
+    // ── Botón Guardar: decide si crea o actualiza ──
+    async function guardarOActualizar() {
+      const nombre   = document.getElementById("nombre").value.trim();
+      const rol      = document.getElementById("rol").value.trim();
+      const usuario  = document.getElementById("usuario").value.trim();
+      const password = document.getElementById("password").value.trim();
+      const idEditar = idEmpleadoEditar.value;
+
+      if (!nombre || !rol || !usuario || !password) {
+        mostrarMensaje("❌ Todos los campos son obligatorios, incluyendo la contraseña.", "error");
+        return;
+      }
+
+      try {
+        if (idEditar) {
+          await actualizarEmpleado(idEditar, nombre, rol, usuario, password);
+          mostrarMensaje(`✅ Empleado "${nombre}" actualizado correctamente.`, "ok");
+        } else {
+          await crearEmpleado(nombre, rol, usuario, password);
+          mostrarMensaje(`✅ Empleado "${nombre}" registrado correctamente.`, "ok");
+        }
+        limpiarFormulario();
+        await cargarEmpleados();
+      } catch (error) {
+        console.error("Error:", error);
+        mostrarMensaje("❌ " + error.message, "error");
+      }
+    }
+
+    // ── Eventos ──
+    btnActualizarLista.addEventListener("click", cargarEmpleados);
+    btnGuardar.addEventListener("click", guardarOActualizar);
+    btnLimpiar.addEventListener("click", limpiarFormulario);
+
+  </script>
+
+</body>
+</html>

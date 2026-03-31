@@ -1,0 +1,21 @@
+{
+  "name": "proyecto_integradro_latienditamartinez",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "test": "jest"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "cors": "^2.8.6",
+    "express": "^5.2.1",
+    "mysql2": "^3.17.2"
+  },
+  "devDependencies": {
+    "jest": "^30.3.0",
+    "node-mocks-http": "^1.17.2"
+  }
+}

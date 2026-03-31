@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ventas | La Tiendita Martínez</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <header class="topbar">
+    <div class="topbar__inner">
+      <div class="topbar__marca">
+        <img src="logo-tiendiita.png" alt="Logo La Tiendita Martínez" class="topbar__logo">
+        <div class="topbar__texto">
+          <span class="topbar__nombre">La Tiendita Martínez</span>
+          <span class="topbar__subtitulo">Sistema de Gestión</span>
+        </div>
+      </div>
+      <div class="topbar__info">
+        <a href="index.html" class="btn btn--volver">← Volver al panel</a>
+      </div>
+    </div>
+  </header>
+
+  <main class="page page--clientes">
+    <section class="card card--clientes">
+
+      <header class="card__header">
+        <div class="brand-line"></div>
+        <img src="logo-tiendiita.png" alt="Logo La Tiendita Martínez" class="card__logo">
+        <h1 class="card__title">Módulo de Ventas</h1>
+        <p class="card__subtitle">
+          Aquí puedes registrar nuevas ventas y consultar el historial de La Tiendita Martínez.
+        </p>
+      </header>
+
+      <section class="clientes-panel">
+        <h2 class="section-title">
+          <span class="section-title__icon">🛒</span>
+          Nueva venta
+        </h2>
+
+        <div class="form-grid">
+          <div class="form-group">
+            <label for="selEmpleado">Empleado</label>
+            <select id="selEmpleado">
+              <option value="">— Cargando... —</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="selCliente">Cliente <span style="color:var(--texto-secundario);font-weight:400;text-transform:none;">(opcional)</span></label>
+            <select id="selCliente">
+              <option value="">— Cargando... —</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="selMetodoPago">Método de pago</label>
+            <select id="selMetodoPago">
+              <option value="">— Selecciona —</option>
+              <option value="Efectivo">Efectivo</option>
+              <option value="Tarjeta">Tarjeta</option>
+              <option value="Transferencia">Transferencia</option>
+              <option value="Nequi">Nequi</option>
+              <option value="Daviplata">Daviplata</option>
+            </select>
+          </div>
+        </div>
+
+        <h3 style="font-size:0.9rem;font-weight:700;color:var(--texto-secundario);text-transform:uppercase;letter-spacing:0.05em;margin:1.2rem 0 0.6rem;">
+          Agregar producto al carrito
+        </h3>
+
+        <div class="agregar-producto-fila">
+          <div class="form-group" style="flex:1;min-width:180px;">
+            <label for="selProducto">Producto</label>
+            <select id="selProducto">
+              <option value="">— Cargando... —</option>
+            </select>
+          </div>
+          <div class="form-group" style="flex:0 0 110px;">
+            <label for="inputCantidad">Cantidad</label>
+            <input type="number" id="inputCantidad" min="1" value="1">
+          </div>
+          <div style="padding-bottom:0.1rem;">
+            <button type="button" class="btn btn--primary" onclick="agregarAlCarrito()">➕ Agregar</button>
+          </div>
+        </div>
+
+        <p class="carrito-vacio" id="carritoVacio">
+          🛒 El carrito está vacío. Agrega productos para continuar.
+        </p>
+
+        <div id="carritoTablaWrap" style="display:none;">
+          <div class="table-responsive">
+            <table class="carrito-tabla">
+              <thead>
+                <tr>
+                  <th>Producto</th>
+                  <th>Precio unit.</th>
+                  <th>Cantidad</th>
+                  <th>Subtotal</th>
+                  <th>Quitar</th>
+                </tr>
+              </thead>
+              <tbody id="carritoBody"></tbody>
+            </table>
+          </div>
+          <div class="carrito__total">
+            <span class="carrito__total-label">TOTAL A PAGAR:</span>
+            <span class="carrito__total-valor" id="totalCarrito">$0</span>
+          </div>
+        </div>
+
+        <div class="form-actions" style="margin-top:1.2rem;">
+          <button type="button" class="btn btn--primary" id="btnRegistrarVenta">💾 Registrar venta</button>
+          <button type="button" class="btn btn--secondary" onclick="limpiarVenta()">🧹 Limpiar todo</button>
+        </div>
+
+        <div id="mensajeRespuesta" class="mensaje" style="display:none;"></div>
+      </section>
+
+      <section class="clientes-panel">
+        <div class="panel-header">
+          <h2 class="section-title">
+            <span class="section-title__icon">📋</span>
+            Historial de ventas
+          </h2>
+          <button type="button" id="btnActualizarLista" class="btn btn--outline">🔄 Actualizar lista</button>
+        </div>
+        <div class="table-responsive">
+          <table class="tabla-clientes">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Fecha y hora</th>
+                <th>Total</th>
+                <th>Método</th>
+                <th>Estado</th>
+                <th>Empleado</th>
+                <th>Cliente</th>
+                <th>Detalle</th>
+              </tr>
+            </thead>
+            <tbody id="tablaVentasBody">
+              <tr><td colspan="8" class="table-message">Cargando ventas...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <footer class="card__footer">
+        <p class="footer__text">© 2026 Sistema Minimarket · La Tiendita Martínez</p>
+      </footer>
+
+    </section>
+  </main>
+
+  <div class="modal-overlay" id="modalOverlay">
+    <div class="modal-box">
+      <button class="modal-box__cerrar" onclick="cerrarModal()">✕</button>
+      <h2 class="modal-box__titulo" id="modalTitulo">Detalle de venta</h2>
+      <dl class="modal-info-grid" id="modalInfo"></dl>
+      <div class="table-responsive">
+        <table class="carrito-tabla">
+          <thead>
+            <tr>
+              <th>Producto</th>
+              <th>Código</th>
+              <th>Cantidad</th>
+              <th>Precio unit.</th>
+              <th>Subtotal</th>
+            </tr>
+          </thead>
+          <tbody id="modalProductosBody"></tbody>
+        </table>
+      </div>
+      <div class="carrito__total" style="margin-top:1rem;">
+        <span class="carrito__total-label">TOTAL:</span>
+        <span class="carrito__total-valor" id="modalTotal"></span>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    var API_VENTAS    = "http://localhost:3000/app/ventas";
+    var API_EMPLEADOS = "http://localhost:3000/app/empleados";
+    var API_CLIENTES  = "http://localhost:3000/app/clientes";
+    var API_PRODUCTOS = "http://localhost:3000/app/productos";
+
+    var carrito = [];
+
+    window.onload = function() {
+      cargarSelectEmpleados();
+      cargarSelectClientes();
+      cargarSelectProductos();
+      cargarVentas();
+      document.getElementById("btnRegistrarVenta").onclick = registrarVenta;
+      document.getElementById("btnActualizarLista").onclick = cargarVentas;
+      document.getElementById("modalOverlay").onclick = function(e) {
+        if (e.target === this) cerrarModal();
+      };
+    };
+
+    function poblarSelect(selectId, lista, campoValor, campoTexto, textoVacio) {
+      var sel = document.getElementById(selectId);
+      while (sel.options.length > 0) sel.remove(0);
+      var optDefault = document.createElement("option");
+      optDefault.value = "";
+      optDefault.text  = textoVacio;
+      sel.appendChild(optDefault);
+      for (var i = 0; i < lista.length; i++) {
+        var opt = document.createElement("option");
+        opt.value = String(lista[i][campoValor]);
+        opt.text  = lista[i][campoTexto];
+        sel.appendChild(opt);
+      }
+    }
+
+    async function cargarSelectEmpleados() {
+      try {
+        var res   = await fetch(API_EMPLEADOS + "?t=" + Date.now(), { cache: "no-store" });
+        var texto = await res.text();
+        var json  = JSON.parse(texto);
+        var lista = json.data || [];
+        var datos = [];
+        for (var i = 0; i < lista.length; i++) {
+          datos.push({
+            id:    lista[i].idEmpleado,
+            label: lista[i].nombre + " (" + lista[i].rol + ")"
+          });
+        }
+        poblarSelect("selEmpleado", datos, "id", "label", "— Selecciona empleado —");
+      } catch(err) {
+        var sel = document.getElementById("selEmpleado");
+        while (sel.options.length > 0) sel.remove(0);
+        var opt = document.createElement("option");
+        opt.value = ""; opt.text = "Error al cargar"; sel.appendChild(opt);
+      }
+    }
+
+    async function cargarSelectClientes() {
+      try {
+        var res   = await fetch(API_CLIENTES + "?t=" + Date.now(), { cache: "no-store" });
+        var texto = await res.text();
+        var json  = JSON.parse(texto);
+        var lista = json.data || [];
+        var datos = [];
+        for (var i = 0; i < lista.length; i++) {
+          datos.push({
+            id:    lista[i].idCliente,
+            label: lista[i].nombre
+          });
+        }
+        poblarSelect("selCliente", datos, "id", "label", "— Sin cliente registrado —");
+      } catch(err) {
+        var sel = document.getElementById("selCliente");
+        while (sel.options.length > 0) sel.remove(0);
+        var opt = document.createElement("option");
+        opt.value = ""; opt.text = "Error al cargar"; sel.appendChild(opt);
+      }
+    }
+
+    async function cargarSelectProductos() {
+      try {
+        var res   = await fetch(API_PRODUCTOS + "?t=" + Date.now(), { cache: "no-store" });
+        var texto = await res.text();
+        var json  = JSON.parse(texto);
+        var lista = json.productos || json.data || [];
+        window._productos = lista;
+        var datos = [];
+        for (var i = 0; i < lista.length; i++) {
+          datos.push({
+            id:    lista[i].idProducto,
+            label: lista[i].nombre + " — $" + Number(lista[i].precioVenta).toLocaleString("es-CO")
+          });
+        }
+        poblarSelect("selProducto", datos, "id", "label", "— Selecciona un producto —");
+      } catch(err) {
+        var sel = document.getElementById("selProducto");
+        while (sel.options.length > 0) sel.remove(0);
+        var opt = document.createElement("option");
+        opt.value = ""; opt.text = "Error al cargar"; sel.appendChild(opt);
+      }
+    }
+
+    function agregarAlCarrito() {
+      var sel      = document.getElementById("selProducto");
+      var idProd   = parseInt(sel.value);
+      var cantidad = parseInt(document.getElementById("inputCantidad").value);
+
+      if (!idProd)                   { mostrarMensaje("Selecciona un producto.", "error"); return; }
+      if (!cantidad || cantidad < 1) { mostrarMensaje("La cantidad debe ser mayor a 0.", "error"); return; }
+
+      var producto = null;
+      var prods = window._productos || [];
+      for (var i = 0; i < prods.length; i++) {
+        if (prods[i].idProducto === idProd) { producto = prods[i]; break; }
+      }
+      if (!producto) { mostrarMensaje("Producto no encontrado.", "error"); return; }
+
+      var existente = null;
+      for (var i = 0; i < carrito.length; i++) {
+        if (carrito[i].idProducto === idProd) { existente = carrito[i]; break; }
+      }
+      if (existente) {
+        existente.cantidad += cantidad;
+      } else {
+        carrito.push({
+          idProducto:  producto.idProducto,
+          nombre:      producto.nombre,
+          precioVenta: Number(producto.precioVenta),
+          cantidad:    cantidad
+        });
+      }
+
+      sel.value = "";
+      document.getElementById("inputCantidad").value = 1;
+      renderizarCarrito();
+    }
+
+    function quitarDelCarrito(idProducto) {
+      var nuevo = [];
+      for (var i = 0; i < carrito.length; i++) {
+        if (carrito[i].idProducto !== idProducto) nuevo.push(carrito[i]);
+      }
+      carrito = nuevo;
+      renderizarCarrito();
+    }
+
+    function renderizarCarrito() {
+      var vacio     = document.getElementById("carritoVacio");
+      var tablaWrap = document.getElementById("carritoTablaWrap");
+      var tbody     = document.getElementById("carritoBody");
+      var totalEl   = document.getElementById("totalCarrito");
+
+      if (carrito.length === 0) {
+        vacio.style.display     = "block";
+        tablaWrap.style.display = "none";
+        return;
+      }
+
+      vacio.style.display     = "none";
+      tablaWrap.style.display = "block";
+
+      var total = 0;
+      var filas = "";
+      for (var i = 0; i < carrito.length; i++) {
+        var item     = carrito[i];
+        var subtotal = item.precioVenta * item.cantidad;
+        total += subtotal;
+        filas += "<tr>";
+        filas += "<td>" + item.nombre + "</td>";
+        filas += "<td>$" + item.precioVenta.toLocaleString("es-CO") + "</td>";
+        filas += "<td>" + item.cantidad + "</td>";
+        filas += "<td>$" + subtotal.toLocaleString("es-CO") + "</td>";
+        filas += "<td><button type='button' class='btn btn--danger' style='padding:0.25rem 0.6rem;font-size:0.78rem;' onclick='quitarDelCarrito(" + item.idProducto + ")'>X</button></td>";
+        filas += "</tr>";
+      }
+      tbody.innerHTML = filas;
+      totalEl.textContent = "$" + total.toLocaleString("es-CO");
+    }
+
+    async function registrarVenta() {
+      var idEmpleado = document.getElementById("selEmpleado").value;
+      var idCliente  = document.getElementById("selCliente").value || null;
+      var metodoPago = document.getElementById("selMetodoPago").value;
+
+      if (!idEmpleado) { mostrarMensaje("Debes seleccionar un empleado.", "error"); return; }
+      if (!metodoPago) { mostrarMensaje("Debes seleccionar el metodo de pago.", "error"); return; }
+      if (carrito.length === 0) { mostrarMensaje("El carrito esta vacio.", "error"); return; }
+
+      var productos = [];
+      for (var i = 0; i < carrito.length; i++) {
+        productos.push({ idProducto: carrito[i].idProducto, cantidad: carrito[i].cantidad });
+      }
+
+      var cuerpo = {
+        idEmpleado: parseInt(idEmpleado),
+        idCliente:  idCliente ? parseInt(idCliente) : null,
+        metodoPago: metodoPago,
+        productos:  productos
+      };
+
+      try {
+        var res  = await fetch(API_VENTAS, {
+          method:  "POST",
+          headers: { "Content-Type": "application/json" },
+          body:    JSON.stringify(cuerpo)
+        });
+        var json = await res.json();
+        if (json.ok) {
+          mostrarMensaje("Venta #" + json.idVenta + " registrada. Total: $" + Number(json.totalPagar).toLocaleString("es-CO"), "ok");
+          limpiarVenta();
+          cargarVentas();
+        } else {
+          mostrarMensaje(json.mensaje, "error");
+        }
+      } catch(err) {
+        mostrarMensaje("Error al conectar con el servidor.", "error");
+      }
+    }
+
+    async function cargarVentas() {
+      var tbody = document.getElementById("tablaVentasBody");
+      tbody.innerHTML = "<tr><td colspan='8' class='table-message'>Cargando ventas...</td></tr>";
+      try {
+        var res  = await fetch(API_VENTAS + "/listar?t=" + Date.now(), { cache: "no-store" });
+        var json = await res.json();
+        if (!json.ok || !json.data || json.data.length === 0) {
+          tbody.innerHTML = "<tr><td colspan='8' class='table-message'>No hay ventas registradas.</td></tr>";
+          return;
+        }
+        var filas = "";
+        for (var i = 0; i < json.data.length; i++) {
+          var v = json.data[i];
+          filas += "<tr>";
+          filas += "<td>" + v.idVenta + "</td>";
+          filas += "<td>" + formatearFecha(v.fechaHora) + "</td>";
+          filas += "<td>$" + Number(v.totalPagar).toLocaleString("es-CO") + "</td>";
+          filas += "<td>" + v.metodoPago + "</td>";
+          filas += "<td><span class='badge badge--finalizada'>" + v.estado + "</span></td>";
+          filas += "<td>" + (v.empleado || "-") + "</td>";
+          filas += "<td>" + (v.cliente || "Sin cliente") + "</td>";
+          filas += "<td><button type='button' class='btn btn--outline' style='font-size:0.8rem;padding:0.3rem 0.7rem;' onclick='verDetalle(" + v.idVenta + ")'>Ver</button></td>";
+          filas += "</tr>";
+        }
+        tbody.innerHTML = filas;
+      } catch(err) {
+        tbody.innerHTML = "<tr><td colspan='8' class='table-message'>Error al conectar con el servidor.</td></tr>";
+      }
+    }
+
+    async function verDetalle(idVenta) {
+      try {
+        var res  = await fetch(API_VENTAS + "/" + idVenta + "?t=" + Date.now(), { cache: "no-store" });
+        var json = await res.json();
+        if (!json.ok) { mostrarMensaje("No se pudo cargar el detalle.", "error"); return; }
+
+        document.getElementById("modalTitulo").textContent = "Detalle de venta #" + json.idVenta;
+        document.getElementById("modalInfo").innerHTML =
+          "<dt>Fecha y hora</dt><dd>" + formatearFecha(json.fechaHora) + "</dd>" +
+          "<dt>Metodo de pago</dt><dd>" + json.metodoPago + "</dd>" +
+          "<dt>Estado</dt><dd><span class='badge badge--finalizada'>" + json.estado + "</span></dd>" +
+          "<dt>Empleado</dt><dd>" + (json.empleado || "-") + "</dd>" +
+          "<dt>Cliente</dt><dd>" + (json.cliente || "Sin cliente registrado") + "</dd>";
+
+        var filas = "";
+        for (var i = 0; i < json.productos.length; i++) {
+          var p = json.productos[i];
+          filas += "<tr>";
+          filas += "<td>" + p.nombreProducto + "</td>";
+          filas += "<td>" + p.codigoBarra + "</td>";
+          filas += "<td>" + p.cantidad + "</td>";
+          filas += "<td>$" + Number(p.precioUnitario).toLocaleString("es-CO") + "</td>";
+          filas += "<td>$" + Number(p.subtotalLinea).toLocaleString("es-CO") + "</td>";
+          filas += "</tr>";
+        }
+        document.getElementById("modalProductosBody").innerHTML = filas;
+        document.getElementById("modalTotal").textContent = "$" + Number(json.totalPagar).toLocaleString("es-CO");
+        document.getElementById("modalOverlay").classList.add("activo");
+      } catch(err) {
+        mostrarMensaje("Error al conectar con el servidor.", "error");
+      }
+    }
+
+    function cerrarModal() {
+      document.getElementById("modalOverlay").classList.remove("activo");
+    }
+
+    function limpiarVenta() {
+      carrito = [];
+      renderizarCarrito();
+      document.getElementById("selEmpleado").value   = "";
+      document.getElementById("selCliente").value    = "";
+      document.getElementById("selMetodoPago").value = "";
+      document.getElementById("selProducto").value   = "";
+      document.getElementById("inputCantidad").value = 1;
+    }
+
+    function formatearFecha(fechaISO) {
+      if (!fechaISO) return "-";
+      return new Date(fechaISO).toLocaleString("es-CO", {
+        year: "numeric", month: "2-digit", day: "2-digit",
+        hour: "2-digit", minute: "2-digit"
+      });
+    }
+
+    function mostrarMensaje(texto, tipo) {
+      var div = document.getElementById("mensajeRespuesta");
+      div.textContent   = texto;
+      div.className     = "mensaje " + (tipo === "ok" ? "mensaje--ok" : "mensaje--error");
+      div.style.display = "block";
+      setTimeout(function() { div.style.display = "none"; }, 5000);
+    }
+  </script>
+
+</body>
+</html>

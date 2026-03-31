@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Inventario | La Tiendita Martínez</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <header class="topbar">
+    <div class="topbar__inner">
+      <div class="topbar__marca">
+        <img src="logo-tiendiita.png" alt="Logo La Tiendita Martínez" class="topbar__logo">
+        <div class="topbar__texto">
+          <span class="topbar__nombre">La Tiendita Martínez</span>
+          <span class="topbar__subtitulo">Sistema de Gestión</span>
+        </div>
+      </div>
+      <div class="topbar__info">
+        <a href="index.html" class="btn btn--volver">← Volver al panel</a>
+      </div>
+    </div>
+  </header>
+
+  <main class="page page--clientes">
+    <section class="card card--clientes">
+
+      <header class="card__header">
+        <div class="brand-line"></div>
+        <img src="logo-tiendiita.png" alt="Logo La Tiendita Martínez" class="card__logo">
+        <h1 class="card__title">Módulo de Inventario</h1>
+        <p class="card__subtitle">
+          Aquí puedes consultar y actualizar el stock de productos de La Tiendita Martínez.
+        </p>
+      </header>
+
+      <!-- PANEL: EDITAR INVENTARIO -->
+      <section class="clientes-panel" id="panelEditar" style="display:none;">
+        <h2 class="section-title" id="tituloEditar">
+          <span class="section-title__icon">✏️</span>
+          Editando inventario
+        </h2>
+
+        <input type="hidden" id="idInventarioEditar" value="">
+
+        <div class="form-grid">
+          <div class="form-group">
+            <label for="editProducto">Producto</label>
+            <input type="text" id="editProducto" disabled>
+          </div>
+          <div class="form-group">
+            <label for="editUbicacion">Ubicacion</label>
+            <input type="text" id="editUbicacion" placeholder="Ej: Bodega A">
+          </div>
+          <div class="form-group">
+            <label for="editStockActual">Stock actual</label>
+            <input type="number" id="editStockActual" min="0">
+          </div>
+          <div class="form-group">
+            <label for="editStockMinimo">Stock minimo</label>
+            <input type="number" id="editStockMinimo" min="0">
+          </div>
+          <div class="form-actions">
+            <button type="button" class="btn btn--primary" id="btnGuardarInventario">
+              💾 Guardar cambios
+            </button>
+            <button type="button" class="btn btn--secondary" onclick="cancelarEdicion()">
+              ✖ Cancelar
+            </button>
+          </div>
+        </div>
+
+        <div id="mensajeRespuesta" class="mensaje" style="display:none;"></div>
+      </section>
+
+      <!-- PANEL: LISTADO -->
+      <section class="clientes-panel">
+        <div class="panel-header">
+          <h2 class="section-title">
+            <span class="section-title__icon">🏪</span>
+            Listado de inventario
+          </h2>
+          <button type="button" id="btnActualizarLista" class="btn btn--outline">
+            🔄 Actualizar lista
+          </button>
+        </div>
+
+        <div class="table-responsive">
+          <table class="tabla-clientes">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Producto</th>
+                <th>Codigo</th>
+                <th>Categoria</th>
+                <th>Ubicacion</th>
+                <th>Stock actual</th>
+                <th>Stock minimo</th>
+                <th>Estado</th>
+                <th>Ultima actualizacion</th>
+                <th>Acciones</th>
+              </tr>
+            </thead>
+            <tbody id="tablaInventarioBody">
+              <tr><td colspan="10" class="table-message">Cargando inventario...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <footer class="card__footer">
+        <p class="footer__text">© 2026 Sistema Minimarket · La Tiendita Martínez</p>
+      </footer>
+
+    </section>
+  </main>
+
+  <script>
+    var API_INVENTARIO = "http://localhost:3000/app/inventario";
+
+    window.onload = function() {
+      cargarInventario();
+      document.getElementById("btnActualizarLista").onclick = cargarInventario;
+      document.getElementById("btnGuardarInventario").onclick = guardarInventario;
+    };
+
+    async function cargarInventario() {
+      var tbody = document.getElementById("tablaInventarioBody");
+      tbody.innerHTML = "<tr><td colspan='10' class='table-message'>Cargando...</td></tr>";
+      try {
+        var res  = await fetch(API_INVENTARIO + "?t=" + Date.now(), { cache: "no-store" });
+        var json = await res.json();
+        if (!json.ok || !json.data || json.data.length === 0) {
+          tbody.innerHTML = "<tr><td colspan='10' class='table-message'>No hay registros de inventario.</td></tr>";
+          return;
+        }
+        var filas = "";
+        for (var i = 0; i < json.data.length; i++) {
+          var item  = json.data[i];
+          var bajo  = item.stockActual <= item.stockMinimo;
+          var badge = bajo
+            ? "<span style='background:#fdecea;color:#b71c1c;padding:0.2rem 0.6rem;border-radius:20px;font-size:0.75rem;font-weight:700;'>Stock bajo</span>"
+            : "<span style='background:#d1fae5;color:#065f46;padding:0.2rem 0.6rem;border-radius:20px;font-size:0.75rem;font-weight:700;'>Normal</span>";
+          var fecha = item.fechaUltimaActualizacion
+            ? new Date(item.fechaUltimaActualizacion).toLocaleString("es-CO", { year:"numeric", month:"2-digit", day:"2-digit", hour:"2-digit", minute:"2-digit" })
+            : "-";
+          filas += "<tr" + (bajo ? " style='background:#fff8f8;'" : "") + ">";
+          filas += "<td>" + item.idInventario + "</td>";
+          filas += "<td>" + item.nombreProducto + "</td>";
+          filas += "<td>" + item.codigoBarra + "</td>";
+          filas += "<td>" + item.categoria + "</td>";
+          filas += "<td>" + item.ubicacion + "</td>";
+          filas += "<td><strong>" + item.stockActual + "</strong></td>";
+          filas += "<td>" + item.stockMinimo + "</td>";
+          filas += "<td>" + badge + "</td>";
+          filas += "<td>" + fecha + "</td>";
+          filas += "<td><button type='button' class='btn btn--secondary' onclick='cargarParaEditar(" + item.idInventario + ")'>✏️ Editar</button></td>";
+          filas += "</tr>";
+        }
+        tbody.innerHTML = filas;
+      } catch(err) {
+        tbody.innerHTML = "<tr><td colspan='10' class='table-message'>Error al conectar con el servidor.</td></tr>";
+      }
+    }
+
+    async function cargarParaEditar(idInventario) {
+      try {
+        var res  = await fetch(API_INVENTARIO + "/" + idInventario + "?t=" + Date.now(), { cache: "no-store" });
+        var json = await res.json();
+        if (!json.ok) { mostrarMensaje("No se pudo cargar el registro.", "error"); return; }
+
+        var item = json.data;
+        document.getElementById("idInventarioEditar").value = item.idInventario;
+        document.getElementById("editProducto").value       = item.nombreProducto + " (" + item.codigoBarra + ")";
+        document.getElementById("editUbicacion").value      = item.ubicacion;
+        document.getElementById("editStockActual").value    = item.stockActual;
+        document.getElementById("editStockMinimo").value    = item.stockMinimo;
+
+        document.getElementById("tituloEditar").innerHTML =
+          "<span class='section-title__icon'>✏️</span> Editando: " + item.nombreProducto;
+
+        var panel = document.getElementById("panelEditar");
+        panel.style.display = "block";
+        panel.scrollIntoView({ behavior: "smooth" });
+      } catch(err) {
+        mostrarMensaje("Error al conectar con el servidor.", "error");
+      }
+    }
+
+    async function guardarInventario() {
+      var id          = document.getElementById("idInventarioEditar").value;
+      var ubicacion   = document.getElementById("editUbicacion").value.trim();
+      var stockActual = parseInt(document.getElementById("editStockActual").value);
+      var stockMinimo = parseInt(document.getElementById("editStockMinimo").value);
+
+      if (!ubicacion)          { mostrarMensaje("La ubicacion es obligatoria.", "error"); return; }
+      if (isNaN(stockActual) || stockActual < 0) { mostrarMensaje("Stock actual invalido.", "error"); return; }
+      if (isNaN(stockMinimo) || stockMinimo < 0) { mostrarMensaje("Stock minimo invalido.", "error"); return; }
+
+      try {
+        var res  = await fetch(API_INVENTARIO + "/" + id, {
+          method:  "PUT",
+          headers: { "Content-Type": "application/json" },
+          body:    JSON.stringify({ ubicacion: ubicacion, stockActual: stockActual, stockMinimo: stockMinimo })
+        });
+        var json = await res.json();
+        if (json.ok) {
+          mostrarMensaje("Inventario actualizado correctamente.", "ok");
+          cancelarEdicion();
+          cargarInventario();
+        } else {
+          mostrarMensaje(json.mensaje, "error");
+        }
+      } catch(err) {
+        mostrarMensaje("Error al conectar con el servidor.", "error");
+      }
+    }
+
+    function cancelarEdicion() {
+      document.getElementById("panelEditar").style.display = "none";
+      document.getElementById("idInventarioEditar").value  = "";
+      document.getElementById("editProducto").value        = "";
+      document.getElementById("editUbicacion").value       = "";
+      document.getElementById("editStockActual").value     = "";
+      document.getElementById("editStockMinimo").value     = "";
+    }
+
+    function mostrarMensaje(texto, tipo) {
+      var div = document.getElementById("mensajeRespuesta");
+      div.textContent   = texto;
+      div.className     = "mensaje " + (tipo === "ok" ? "mensaje--ok" : "mensaje--error");
+      div.style.display = "block";
+      setTimeout(function() { div.style.display = "none"; }, 4000);
+    }
+  </script>
+
+</body>
+</html>

@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>La Tiendita Martínez | Sistema de Gestión</title>
+  <meta name="description" content="Sistema de gestión del Minimarket La Tiendita Martínez">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <!-- ── ENCABEZADO ── -->
+  <header class="topbar">
+    <div class="topbar__inner">
+      <div class="topbar__marca">
+        <img
+          src="logo-tiendiita.png"
+          alt="Logo La Tiendita Martínez"
+          class="topbar__logo"
+        >
+        <div class="topbar__texto">
+          <span class="topbar__nombre">La Tiendita Martínez</span>
+          <span class="topbar__subtitulo">Sistema de Gestión</span>
+        </div>
+      </div>
+      <div class="topbar__info">
+        <span class="topbar__fecha" id="fechaHoy"></span>
+      </div>
+    </div>
+  </header>
+
+  <!-- ── CONTENIDO PRINCIPAL ── -->
+  <main class="dashboard">
+
+    <div class="dashboard__bienvenida">
+      <h1 class="dashboard__titulo">Panel principal</h1>
+      <p class="dashboard__subtitulo">
+        Selecciona un módulo para comenzar a trabajar.
+      </p>
+    </div>
+
+    <div class="dashboard__grid">
+
+      <a href="clientes.html" class="modulo-card">
+        <span class="modulo-card__icono">👥</span>
+        <span class="modulo-card__nombre">Clientes</span>
+        <span class="modulo-card__descripcion">Registrar, consultar y gestionar clientes</span>
+      </a>
+
+      <a href="productos.html" class="modulo-card">
+        <span class="modulo-card__icono">📦</span>
+        <span class="modulo-card__nombre">Productos</span>
+        <span class="modulo-card__descripcion">Administrar el catálogo de productos</span>
+      </a>
+
+      <a href="empleados.html" class="modulo-card">
+        <span class="modulo-card__icono">👔</span>
+        <span class="modulo-card__nombre">Empleados</span>
+        <span class="modulo-card__descripcion">Gestionar el personal de la tienda</span>
+      </a>
+
+      <a href="ventas.html" class="modulo-card">
+        <span class="modulo-card__icono">🧾</span>
+        <span class="modulo-card__nombre">Ventas</span>
+        <span class="modulo-card__descripcion">Registrar y consultar ventas realizadas</span>
+      </a>
+
+      <a href="inventario.html" class="modulo-card">
+        <span class="modulo-card__icono">🏪</span>
+        <span class="modulo-card__nombre">Inventario</span>
+        <span class="modulo-card__descripcion">Control de stock y movimientos</span>
+      </a>
+
+    </div>
+  </main>
+
+  <!-- ── FOOTER ── -->
+  <footer class="footer-principal">
+    <p class="footer__text">© 2026 Sistema Minimarket · La Tiendita Martínez</p>
+  </footer>
+
+  <script>
+    // Mostrar fecha actual en el encabezado
+    const fechaHoy = document.getElementById("fechaHoy");
+    const ahora = new Date();
+    fechaHoy.textContent = ahora.toLocaleDateString("es-CO", {
+      weekday: "long",
+      year: "numeric",
+      month: "long",
+      day: "numeric"
+    });
+  </script>
+
+</body>
+</html>

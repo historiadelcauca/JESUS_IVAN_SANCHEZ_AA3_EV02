@@ -1,0 +1,894 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+:root {
+  --azul-principal: #0f3f7a;
+  --azul-secundario: #184a8c;
+  --amarillo-principal: #f2c230;
+  --fondo-general: #edf3f9;
+  --blanco: #ffffff;
+  --gris-suave: #f6f8fb;
+  --gris-borde: #d5deea;
+  --texto-principal: #1f2937;
+  --texto-secundario: #5b6778;
+  --sombra: rgba(15, 63, 122, 0.12);
+}
+
+body {
+  font-family: Arial, Helvetica, sans-serif;
+  background: linear-gradient(135deg, #eef3f8 0%, #dde7f1 100%);
+  color: var(--texto-principal);
+  min-height: 100vh;
+}
+
+/* =========================
+   ESTRUCTURA GENERAL
+========================= */
+.page,
+.container {
+  width: 100%;
+  min-height: 100vh;
+  padding: 24px 16px;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+}
+
+/* Con topbar, el page no debe ocupar 100vh desde arriba */
+.page--con-topbar {
+  min-height: calc(100vh - 96px);
+  padding-top: 24px;
+}
+
+.card {
+  width: 100%;
+  max-width: 1100px;
+  background-color: var(--blanco);
+  border-radius: 24px;
+  box-shadow: 0 18px 45px var(--sombra);
+  border: 1px solid rgba(15, 63, 122, 0.08);
+  padding: 0 32px 32px 32px;
+}
+
+.card__header {
+  text-align: center;
+  margin-bottom: 28px;
+}
+
+.card__logo {
+  display: block;
+  width: 140px;
+  max-width: 100%;
+  height: auto;
+  margin: 0 auto 16px auto;
+}
+
+.card__title {
+  font-size: 2.6rem;
+  line-height: 1.1;
+  color: var(--azul-principal);
+  font-weight: 800;
+  margin-bottom: 10px;
+}
+
+.card__subtitle {
+  font-size: 1.1rem;
+  line-height: 1.6;
+  color: var(--texto-secundario);
+  max-width: 760px;
+  margin: 0 auto;
+}
+
+.card__footer {
+  margin-top: 24px;
+  padding-top: 16px;
+  border-top: 1px solid var(--gris-borde);
+}
+
+.footer__text {
+  text-align: center;
+  color: var(--texto-secundario);
+  font-size: 0.95rem;
+}
+
+/* =========================
+   FRANJA SUPERIOR
+========================= */
+.brand-line {
+  width: calc(100% + 64px);
+  margin-left: -32px;
+  height: 8px;
+  border-radius: 24px 24px 0 0;
+  background: linear-gradient(
+    90deg,
+    var(--azul-principal) 0%,
+    #2c6bb4 45%,
+    var(--amarillo-principal) 100%
+  );
+  margin-bottom: 24px;
+}
+
+/* =========================
+   TOPBAR — ENCABEZADO PRINCIPAL
+========================= */
+.topbar {
+  width: 100%;
+  background-color: var(--azul-principal);
+  padding: 12px 32px;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.18);
+}
+
+.topbar__inner {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.topbar__marca {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.topbar__logo {
+  width: 52px;
+  height: 52px;
+  object-fit: contain;
+  background-color: var(--blanco);
+  border-radius: 10px;
+  padding: 4px;
+}
+
+.topbar__texto {
+  display: flex;
+  flex-direction: column;
+}
+
+.topbar__nombre {
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: var(--blanco);
+  line-height: 1.2;
+}
+
+.topbar__subtitulo {
+  font-size: 0.82rem;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.topbar__info {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.topbar__fecha {
+  font-size: 0.88rem;
+  color: rgba(255, 255, 255, 0.85);
+  text-transform: capitalize;
+}
+
+/* =========================
+   BOTÓN VOLVER
+========================= */
+.btn--volver {
+  background-color: rgba(255, 255, 255, 0.15);
+  color: var(--blanco);
+  border: 1.5px solid rgba(255, 255, 255, 0.5);
+  border-radius: 12px;
+  padding: 8px 18px;
+  font-size: 0.92rem;
+  font-weight: 700;
+  text-decoration: none;
+  transition: all 0.2s ease;
+  display: inline-block;
+}
+
+.btn--volver:hover {
+  background-color: rgba(255, 255, 255, 0.25);
+  border-color: var(--blanco);
+}
+
+/* =========================
+   LOGIN
+========================= */
+.form {
+  width: 100%;
+  max-width: 680px;
+  margin: 0 auto;
+}
+
+.form__row {
+  display: grid;
+  grid-template-columns: 140px 1fr 220px;
+  gap: 12px;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.form__row label {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--texto-principal);
+}
+
+.form__row input {
+  width: 100%;
+  min-height: 46px;
+  border: 1px solid var(--gris-borde);
+  border-radius: 12px;
+  padding: 10px 14px;
+  font-size: 1rem;
+  outline: none;
+  background-color: var(--blanco);
+}
+
+.form__row input:focus {
+  border-color: var(--azul-principal);
+  box-shadow: 0 0 0 3px rgba(15, 63, 122, 0.12);
+}
+
+.form__hint {
+  font-size: 0.88rem;
+  color: var(--texto-secundario);
+}
+
+.form__check {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 6px 0 20px 0;
+}
+
+.form__check input {
+  width: 18px;
+  height: 18px;
+}
+
+.form__check label {
+  font-size: 1rem;
+  color: var(--texto-principal);
+}
+
+.form__actions {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 20px;
+}
+
+.links-extra {
+  text-align: left;
+  font-size: 0.98rem;
+}
+
+.links-extra a {
+  color: var(--azul-principal);
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.links-extra a:hover {
+  text-decoration: underline;
+}
+
+/* =========================
+   CLIENTES / MÓDULOS CRUD
+========================= */
+.card--clientes {
+  max-width: 1200px;
+}
+
+.clientes-panel {
+  background-color: var(--gris-suave);
+  border: 1px solid var(--gris-borde);
+  border-radius: 18px;
+  padding: 24px;
+  margin-bottom: 20px;
+}
+
+.section-title {
+  font-size: 1.8rem;
+  color: var(--azul-principal);
+  font-weight: 800;
+  margin-bottom: 18px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.section-title__icon {
+  font-size: 1.6rem;
+}
+
+.panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+
+.panel-header .section-title {
+  margin-bottom: 0;
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+}
+
+.form-group label {
+  font-size: 0.92rem;
+  font-weight: 700;
+  color: var(--texto-principal);
+  margin-bottom: 6px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+/* Input Y SELECT comparten los mismos estilos */
+.form-group input,
+.form-group select {
+  width: 100%;
+  min-height: 46px;
+  border: 1px solid var(--gris-borde);
+  border-radius: 12px;
+  padding: 10px 14px;
+  font-size: 0.98rem;
+  outline: none;
+  background-color: var(--blanco);
+  color: var(--texto-principal);
+  appearance: none;
+  -webkit-appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%235b6778' d='M1 1l5 5 5-5'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 14px center;
+  padding-right: 36px;
+}
+
+/* Quitar la flechita del select nativo en Firefox */
+.form-group select::-ms-expand {
+  display: none;
+}
+
+/* Los input de tipo number no necesitan la flechita de select */
+.form-group input[type="number"] {
+  background-image: none;
+  padding-right: 14px;
+}
+
+/* Los input de tipo password tampoco */
+.form-group input[type="password"] {
+  background-image: none;
+  padding-right: 14px;
+}
+
+/* Los input de tipo date tampoco */
+.form-group input[type="date"] {
+  background-image: none;
+  padding-right: 14px;
+}
+
+.form-group input:focus,
+.form-group select:focus {
+  border-color: var(--azul-principal);
+  box-shadow: 0 0 0 3px rgba(15, 63, 122, 0.12);
+}
+
+.form-actions {
+  grid-column: 1 / -1;
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-top: 6px;
+}
+
+/* =========================
+   BOTONES
+========================= */
+.btn {
+  border: none;
+  border-radius: 12px;
+  padding: 12px 22px;
+  font-size: 0.98rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn:hover {
+  transform: translateY(-1px);
+}
+
+.btn--primary {
+  background-color: var(--azul-principal);
+  color: var(--blanco);
+}
+
+.btn--primary:hover {
+  background-color: #0c3464;
+}
+
+.btn--secondary {
+  background-color: #e8edf5;
+  color: var(--azul-principal);
+  border: 1px solid #cfd8e3;
+}
+
+.btn--secondary:hover {
+  background-color: #dbe4ef;
+}
+
+.btn--outline {
+  background-color: transparent;
+  color: var(--azul-principal);
+  border: 1.5px solid var(--azul-principal);
+  padding: 8px 18px;
+  font-size: 0.92rem;
+}
+
+.btn--outline:hover {
+  background-color: var(--azul-principal);
+  color: var(--blanco);
+}
+
+.btn--danger {
+  background-color: #c0392b;
+  color: var(--blanco);
+}
+
+.btn--danger:hover {
+  background-color: #a93226;
+}
+
+/* =========================
+   TABLA
+========================= */
+.table-responsive {
+  width: 100%;
+  overflow-x: auto;
+}
+
+.tabla-clientes {
+  width: 100%;
+  border-collapse: collapse;
+  background-color: var(--blanco);
+  border: 1px solid var(--gris-borde);
+  border-radius: 14px;
+  overflow: hidden;
+}
+
+.tabla-clientes thead {
+  background-color: var(--azul-principal);
+  color: var(--blanco);
+}
+
+.tabla-clientes th {
+  text-align: left;
+  padding: 14px 16px;
+  font-size: 0.92rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.tabla-clientes td {
+  padding: 13px 16px;
+  font-size: 0.95rem;
+  border-top: 1px solid #e8edf3;
+}
+
+.tabla-clientes tbody tr:hover {
+  background-color: #f7faff;
+}
+
+.table-message {
+  text-align: center;
+  color: var(--texto-secundario);
+  padding: 20px;
+  font-size: 0.95rem;
+}
+
+.acciones-celda {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+/* =========================
+   MENSAJE DE RESPUESTA
+========================= */
+.mensaje {
+  margin-top: 14px;
+  padding: 12px 16px;
+  border-radius: 10px;
+  font-size: 0.95rem;
+  font-weight: 600;
+}
+
+.mensaje--ok {
+  background-color: #e6f4ea;
+  color: #1e6e34;
+  border: 1px solid #a8d5b5;
+}
+
+.mensaje--error {
+  background-color: #fdecea;
+  color: #b71c1c;
+  border: 1px solid #f5b4b4;
+}
+
+/* =========================
+   DASHBOARD — PANEL PRINCIPAL
+========================= */
+.dashboard {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 40px 24px;
+}
+
+.dashboard__bienvenida {
+  margin-bottom: 32px;
+}
+
+.dashboard__titulo {
+  font-size: 2rem;
+  font-weight: 800;
+  color: var(--azul-principal);
+  margin-bottom: 6px;
+}
+
+.dashboard__subtitulo {
+  font-size: 1rem;
+  color: var(--texto-secundario);
+}
+
+.dashboard__grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+}
+
+/* =========================
+   TARJETAS DE MÓDULO
+========================= */
+.modulo-card {
+  background-color: var(--blanco);
+  border: 1px solid var(--gris-borde);
+  border-radius: 20px;
+  padding: 32px 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  text-decoration: none;
+  gap: 10px;
+  box-shadow: 0 4px 16px var(--sombra);
+  transition: all 0.2s ease;
+}
+
+.modulo-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 10px 28px var(--sombra);
+  border-color: var(--azul-principal);
+}
+
+.modulo-card__icono {
+  font-size: 2.8rem;
+}
+
+.modulo-card__nombre {
+  font-size: 1.2rem;
+  font-weight: 800;
+  color: var(--azul-principal);
+}
+
+.modulo-card__descripcion {
+  font-size: 0.9rem;
+  color: var(--texto-secundario);
+  line-height: 1.5;
+}
+
+/* =========================
+   FOOTER PRINCIPAL
+========================= */
+.footer-principal {
+  text-align: center;
+  padding: 20px;
+  border-top: 1px solid var(--gris-borde);
+  margin-top: 20px;
+}
+
+/* =========================
+   GRID PRODUCTOS (4 columnas)
+========================= */
+.form-grid--productos {
+  grid-template-columns: repeat(4, 1fr);
+}
+
+/* =========================
+   VENTAS — CARRITO
+========================= */
+.carrito-vacio {
+  text-align: center;
+  color: var(--texto-secundario);
+  padding: 1.5rem;
+  font-size: 0.95rem;
+}
+
+.carrito-tabla {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+}
+
+.carrito-tabla th {
+  background: var(--azul-principal);
+  color: var(--blanco);
+  padding: 0.6rem 0.8rem;
+  text-align: left;
+  font-size: 0.78rem;
+  letter-spacing: 0.04em;
+}
+
+.carrito-tabla td {
+  padding: 0.55rem 0.8rem;
+  border-bottom: 1px solid var(--gris-borde);
+  vertical-align: middle;
+}
+
+.carrito-tabla tr:last-child td {
+  border-bottom: none;
+}
+
+.carrito-tabla tr:hover td {
+  background: var(--gris-suave);
+}
+
+.carrito__total {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem 0.5rem 0;
+  border-top: 2px solid var(--azul-principal);
+  margin-top: 0.5rem;
+}
+
+.carrito__total-label {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--texto-secundario);
+}
+
+.carrito__total-valor {
+  font-size: 1.4rem;
+  font-weight: 800;
+  color: var(--azul-principal);
+}
+
+.agregar-producto-fila {
+  display: flex;
+  gap: 0.75rem;
+  align-items: flex-end;
+  flex-wrap: wrap;
+  margin-bottom: 1rem;
+}
+
+.agregar-producto-fila .form-group {
+  flex: 1;
+  min-width: 180px;
+  margin: 0;
+}
+
+.agregar-producto-fila .form-group--cantidad {
+  flex: 0 0 110px;
+}
+
+/* =========================
+   VENTAS — BADGE ESTADO
+========================= */
+.badge {
+  display: inline-block;
+  padding: 0.2rem 0.6rem;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+}
+
+.badge--finalizada {
+  background: #d1fae5;
+  color: #065f46;
+}
+
+/* =========================
+   VENTAS — MODAL DETALLE
+========================= */
+.modal-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 63, 122, 0.45);
+  z-index: 1000;
+  justify-content: center;
+  align-items: center;
+}
+
+.modal-overlay.activo {
+  display: flex;
+}
+
+.modal-box {
+  background: var(--blanco);
+  border-radius: 14px;
+  padding: 2rem;
+  width: 100%;
+  max-width: 640px;
+  max-height: 85vh;
+  overflow-y: auto;
+  box-shadow: 0 8px 32px rgba(15, 63, 122, 0.18);
+  position: relative;
+}
+
+.modal-box__titulo {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--azul-principal);
+  margin: 0 0 1rem;
+}
+
+.modal-box__cerrar {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  background: none;
+  border: none;
+  font-size: 1.4rem;
+  cursor: pointer;
+  color: var(--texto-secundario);
+  line-height: 1;
+}
+
+.modal-box__cerrar:hover {
+  color: var(--azul-principal);
+}
+
+.modal-info-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.5rem 1.5rem;
+  margin-bottom: 1.2rem;
+  font-size: 0.88rem;
+}
+
+.modal-info-grid dt {
+  color: var(--texto-secundario);
+  font-weight: 600;
+  text-transform: uppercase;
+  font-size: 0.75rem;
+  letter-spacing: 0.04em;
+}
+
+.modal-info-grid dd {
+  color: var(--texto-principal);
+  font-weight: 500;
+  margin: 0 0 0.3rem;
+}
+
+/* =========================
+   RESPONSIVE
+========================= */
+@media (max-width: 980px) {
+  .card {
+    padding: 0 20px 24px 20px;
+  }
+
+  .brand-line {
+    width: calc(100% + 40px);
+    margin-left: -20px;
+  }
+
+  .card__title {
+    font-size: 2rem;
+  }
+
+  .card__subtitle {
+    font-size: 1rem;
+  }
+
+  .form-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .form-grid--productos {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .form__row {
+    grid-template-columns: 1fr;
+    gap: 6px;
+  }
+
+  .panel-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+
+  .dashboard__grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 600px) {
+  .page,
+  .container {
+    padding: 14px 8px;
+  }
+
+  .card {
+    padding: 0 14px 20px 14px;
+    border-radius: 16px;
+  }
+
+  .brand-line {
+    width: calc(100% + 28px);
+    margin-left: -14px;
+  }
+
+  .card__logo {
+    width: 110px;
+  }
+
+  .card__title {
+    font-size: 1.7rem;
+  }
+
+  .section-title {
+    font-size: 1.4rem;
+  }
+
+  .btn {
+    width: 100%;
+  }
+
+  .form-actions,
+  .form__actions {
+    flex-direction: column;
+  }
+
+  .form-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .form-grid--productos {
+    grid-template-columns: 1fr;
+  }
+
+  .dashboard__grid {
+    grid-template-columns: 1fr;
+  }
+
+  .topbar {
+    padding: 12px 16px;
+  }
+
+  .modal-info-grid {
+    grid-template-columns: 1fr;
+  }
+}
