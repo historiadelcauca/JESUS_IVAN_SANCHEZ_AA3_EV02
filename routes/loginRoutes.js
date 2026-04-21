@@ -26,9 +26,12 @@ module.exports = (conexion) => {
         });
       }
 
+      // No enviar la contraseña al frontend
+      delete rows[0].password;
+
       res.json({
         ok: true,
-        mensaje: "Acceso concedido",
+        mensaje: "Inicio de sesión exitoso.",
         empleado: rows[0]
       });
 
