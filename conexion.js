@@ -1,4 +1,4 @@
-const mysql = require("mysql2");
+const mysql = require("mysql2/promise");
 
 const conexion = mysql.createPool({
   host: "localhost",
@@ -10,12 +10,10 @@ const conexion = mysql.createPool({
   queueLimit: 0,
 });
 
-conexion.query("SELECT 1", (err) => {
-  if (err) {
-    console.error("Error conectando a MySQL (POOL):", err.message);
-    return;
-  }
+conexion.query("SELECT 1").then(() => {
   console.log("Conectado a MySQL correctamente (POOL)");
+}).catch((err) => {
+  console.error("Error conectando a MySQL (POOL):", err.message);
 });
 
 module.exports = conexion;
