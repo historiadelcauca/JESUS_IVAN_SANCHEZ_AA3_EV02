@@ -25,9 +25,12 @@ document.addEventListener('DOMContentLoaded', () => {
       const data = await res.json();
 
       if (res.ok && data.ok) {
+        // Guardar el usuario logueado en sessionStorage
+        sessionStorage.setItem('empleado', JSON.stringify(data.empleado));
+        // Redirigir a la página principal
         window.location.href = '/public/ccs/index.html';
       } else {
-        alert(data.mensaje || 'Credenciales incorrectas');
+        alert(data.mensaje || 'Credenciales inválidas.');
       }
     } catch (error) {
       alert('No se pudo conectar con el servidor');
